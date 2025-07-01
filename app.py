@@ -1,13 +1,9 @@
-# app.py
-
-from flask import Flask, render_template, request
 from dotenv import load_dotenv
-from utils.gpt import get_ai_recommendation
 import os
+from flask import Flask, render_template, request
+from utils.gpt import get_ai_recommendation
 
-# .env 파일 로드
 load_dotenv()
-
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
