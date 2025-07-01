@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # 환경 변수 로드
 load_dotenv()
 
-# 클라이언트 생성 (최신 방식)
+# 최신 방식의 클라이언트 객체 생성
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_ai_recommendation(query):
