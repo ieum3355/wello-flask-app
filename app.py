@@ -3,7 +3,9 @@ import os
 from flask import Flask, render_template, request
 from utils.gpt import get_ai_recommendation
 
+# .env 환경변수 로드
 load_dotenv()
+
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
@@ -30,3 +32,7 @@ def terms():
 @app.route("/about")
 def about():
     return render_template("legal/about.html")
+
+# ⚠️ 로컬 실행용
+# if __name__ == "__main__":
+#     app.run(debug=True)
