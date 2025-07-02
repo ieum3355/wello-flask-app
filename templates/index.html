@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
+
 {% block title %}Wello 건강 추천{% endblock %}
+
 {% block content %}
   <form method="post">
     <input type="text" name="query" class="form-control" placeholder="예: 탈모, 오메가3" required>
@@ -8,7 +10,8 @@
 
   {% if result %}
     <div class="alert alert-info mt-4">
-      <strong>추천 결과:</strong><br>{{ result | safe }}
+      <h3>추천 결과:</h3>
+      <p style="white-space: pre-line;">{{ result }}</p>
     </div>
   {% endif %}
 
@@ -16,4 +19,5 @@
     <p class="text-muted">📢 여기에 Google AdSense 광고 삽입 가능</p>
   </div>
 {% endblock %}
+
 
