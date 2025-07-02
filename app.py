@@ -1,7 +1,6 @@
-from dotenv import load_dotenv
-import os
 from flask import Flask, render_template, request
 from utils.gpt import get_ai_recommendation
+from dotenv import load_dotenv
 
 # .env 환경변수 로드
 load_dotenv()
@@ -10,29 +9,21 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = None
+    recommendation = ""
     if request.method == "POST":
-        query = request.form["query"].strip()
-        if query:
-            result = get_ai_recommendation(query)
-    return render_template("index.html", result=result)
-
-@app.route("/result/<keyword>")
-def result(keyword):
-    return render_template("result.html", title=keyword, description=f"{keyword}에 대한 설명입니다.")
-
-@app.route("/privacy")
-def privacy():
-    return render_template("legal/privacy.html")
-
-@app.route("/terms")
-def terms():
-    return render_template("legal/terms.html")
+        query = request.form.get("query")
+        recommendation = get_ai_recommendation(query)
+    return render_template("index.html", recommendation=recommendation)
 
 @app.route("/about")
 def about():
-    return render_template("legal/about.html")
+    return render_template("about.html")  # 경로 수정
 
-# ⚠️ 로컬 실행용
-# if __name__ == "__main__":
-#     app.run(debug=True)
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")  # 경로 수정
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")  # 경로 수정
+
