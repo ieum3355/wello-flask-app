@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request
 from utils.gpt import get_ai_recommendation
 from dotenv import load_dotenv
