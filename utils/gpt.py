@@ -19,3 +19,4 @@ def get_ai_recommendation(query):
     except Exception as e:
         return f"⚠️ 오류가 발생했습니다: {e}"
 
+
