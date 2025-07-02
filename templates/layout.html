@@ -1,21 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Wello{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <header class="text-center py-3">
-    <h1>🌿 Wello | AI 건강 추천</h1>
+  <head>
+    <meta charset="utf-8">
+    <title>Wello | AI 건강 추천</title>
+  </head>
+  <body>
+    <h1>Wello | AI 건강 추천</h1>
     <nav>
-      <a href="/">홈</a> |
-      <a href="/about">소개</a> |
-      <a href="/privacy">개인정보</a> |
-      <a href="/terms">이용약관</a>
+      <a href="{{ url_for('index') }}">홈</a> |
+      <a href="{{ url_for('about') }}">소개</a> |
+      <a href="{{ url_for('privacy') }}">개인정보</a> |
+      <a href="{{ url_for('terms') }}">이용약관</a>
     </nav>
-  </header>
-  <main class="container py-4">{% block content %}{% endblock %}</main>
-</body>
+    <hr>
+    {% block content %}{% endblock %}
+    <hr>
+    <footer>
+      <p>🔗 <a href="https://www.youtube.com/@YourChannel" target="_blank">https://www.youtube.com/@ai_ieum</a></p>
+    </footer>
+  </body>
 </html>
