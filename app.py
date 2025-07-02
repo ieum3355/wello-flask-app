@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request
 from utils.gpt import get_ai_recommendation
 from dotenv import load_dotenv
@@ -17,13 +18,17 @@ def index():
 
 @app.route("/about")
 def about():
-    return render_template("about.html")  # 경로 수정
+    return render_template("about.html")
 
 @app.route("/privacy")
 def privacy():
-    return render_template("privacy.html")  # 경로 수정
+    return render_template("privacy.html")
 
 @app.route("/terms")
 def terms():
-    return render_template("terms.html")  # 경로 수정
+    return render_template("terms.html")
+
+# ✅ 로컬 실행 시 필요
+if __name__ == "__main__":
+    app.run(debug=True)
 
