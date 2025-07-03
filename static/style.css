@@ -2,13 +2,38 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #ffffff;
 }
+
+/* 광고 영역 디자인 */
 .adsense-placeholder {
   border: 1px dashed #ccc;
   padding: 20px;
   margin-top: 30px;
   background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
+/* 입력 필드 스타일 */
+input[type="text"] {
+  height: 50px;
+  font-size: 1rem;
+}
+
+/* 버튼 */
+button {
+  font-weight: bold;
+}
+
+/* 결과 영역 */
+.alert-info {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* 푸터 링크 효과 */
+footer a:hover {
+  text-decoration: underline;
+}
 
 
 
