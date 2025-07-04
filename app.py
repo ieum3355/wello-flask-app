@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from utils.gpt import get_ai_recommendation
 from dotenv import load_dotenv
 
-# .env 환경변수 로드
 load_dotenv()
 
 app = Flask(__name__)
@@ -27,6 +26,12 @@ def privacy():
 def terms():
     return render_template("terms.html")
 
-# ✅ 로컬 실행 시 필요
+# ✅ 캐시 방지용
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
 if __name__ == "__main__":
     app.run(debug=True)
+
