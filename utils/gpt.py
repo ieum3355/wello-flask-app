@@ -2,7 +2,7 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# 환경 변수 로드
+# .env에서 API 키 불러오기
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -31,10 +31,8 @@ def get_ai_recommendation(query):
             ],
             temperature=0.7
         )
-
         return response.choices[0].message.content.strip()
 
     except Exception as e:
         return f"⚠️ 오류가 발생했습니다: {e}"
-
 
