@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
-from utils.gpt import get_ai_recommendation
 from dotenv import load_dotenv
+from utils.gpt import get_ai_recommendation
 
 load_dotenv()
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 def index():
     recommendation = ""
     if request.method == "POST":
-        query = request.form.get("query")
+        query = request.form.get("query", "")
         recommendation = get_ai_recommendation(query)
     return render_template("index.html", recommendation=recommendation)
 
@@ -26,9 +26,8 @@ def privacy():
 def terms():
     return render_template("terms.html")
 
-# ✅ 캐시 방지용
 @app.after_request
-def add_header(response):
+def disable_caching(response):
     response.headers["Cache-Control"] = "no-store"
     return response
 
