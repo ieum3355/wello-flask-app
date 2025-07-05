@@ -1,10 +1,10 @@
 import os
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # 환경 변수 로드
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_ai_recommendation(query):
     try:
@@ -23,7 +23,7 @@ def get_ai_recommendation(query):
 각 항목은 번호를 붙이고 보기 좋게 구성해주세요.
 """
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "당신은 건강 영양 전문가입니다."},
@@ -31,7 +31,9 @@ def get_ai_recommendation(query):
             ],
             temperature=0.7
         )
-        return response.choices[0].message["content"].strip()
+
+        return response.choices[0].message.content.strip()
+
     except Exception as e:
         return f"⚠️ 오류가 발생했습니다: {e}"
 
