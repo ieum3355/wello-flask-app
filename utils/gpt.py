@@ -1,5 +1,6 @@
 import os
 from openai import OpenAI
+from openai import OpenAIError
 
 # Render 환경변수에서 API 키 읽기
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -32,5 +33,5 @@ def get_ai_recommendation(query):
 
         return response.choices[0].message.content.strip()
 
-    except Exception as e:
-        return f"⚠️ 오류가 발생했습니다: {e}"
+    except OpenAIError as e:
+        return f"⚠️ 오류 발생: {str(e)}"
