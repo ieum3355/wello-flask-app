@@ -8,7 +8,7 @@ def get_ai_recommendation(query):
     try:
         # 1단계: 쿼리 유형 판단 (증상인지 영양소인지)
         classification_response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0613",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "당신은 건강 관련 단어를 분석하는 전문가입니다."},
                 {"role": "user", "content": f"'{query}'는 건강 관련 단어입니다. 이것이 '증상'인지 '영양소'인지 딱 한 단어로만 답해주세요."}
@@ -72,7 +72,7 @@ def get_ai_recommendation(query):
 """
 
         detail_response = client.chat.completions.create(
-           model="gpt-4o"
+           model="gpt-4o",
            messages=[
                 {"role": "system", "content": "당신은 건강 영양 전문가입니다."},
                 {"role": "user", "content": prompt}
