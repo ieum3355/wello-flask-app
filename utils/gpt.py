@@ -69,6 +69,10 @@ def get_ai_recommendation(query):
 ✅ 효과적인 섭취 방법
 
 ✅ 모든 정보는 참고용이며, '{query}'이(가) 부족하다고 느껴지면 전문가 상담이 필요합니다.
+
+* 마지막 주의 문구는 한 줄만 작성하고, 추가적인 경고나 설명은 하지마세요.
+
+* 첫 문장을 들여쓰기 없이 출력해주세요.
 """
 
         detail_response = client.chat.completions.create(
