@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from dotenv import load_dotenv
 from utils.gpt import get_ai_recommendation
 
@@ -26,6 +26,10 @@ def privacy():
 def terms():
     return render_template("terms.html")
 
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory("static", "robots.txt")
+
 @app.after_request
 def disable_caching(response):
     response.headers["Cache-Control"] = "no-store"
@@ -33,4 +37,7 @@ def disable_caching(response):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
 
