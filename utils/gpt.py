@@ -72,8 +72,8 @@ def get_ai_recommendation(query):
 """
 
         detail_response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
+           model="gpt-4o"
+           messages=[
                 {"role": "system", "content": "당신은 건강 영양 전문가입니다."},
                 {"role": "user", "content": prompt}
             ],
