@@ -2,23 +2,48 @@ import os
 from openai import OpenAI
 from openai import OpenAIError
 
-# Render 환경변수에서 API 키 읽기
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def get_ai_recommendation(query):
     try:
-        prompt = f"""당신은 건강 영양 전문가입니다.
+        # 1단계: 쿼리 유형 판단 (증상인지 영양소인지)
+        classification_response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0613",
+            messages=[
+                {"role": "system", "content": "당신은 건강 관련 단어를 분석하는 전문가입니다."},
+                {"role": "user", "content": f"'{query}'는 건강 관련 단어입니다. 이것이 '증상'인지 '영양소'인지 딱 한 단어로만 답해주세요."}
+            ],
+            functions=[
+                {
+                    "name": "classify_query",
+                    "description": "입력된 단어가 증상인지 영양소인지 판단",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": ["증상", "영양소"],
+                                "description": "입력된 단어의 분류 결과"
+                            }
+                        },
+                        "required": ["type"]
+                    }
+                }
+            ],
+            function_call={"name": "classify_query"},
+            temperature=0
+        )
 
-사용자가 입력한 {query}는 증상일 수도 있고, 영양소일 수도 있습니다. 
-{query}가 증상일 경우 1번으로 작성하고, 영양소일 경우 2번으로 작성해 주세요.
-AI로써 둘 중 하나로만 판단하여 친절하고 자연스럽게 설명해 주세요. 
-아래 항목에 해당하는 내용을 모두 포함하되, 
-제목 없이 ✅ 표시만 붙이고 각 항목 사이에는 한 줄 공백을 넣어 출력하세요. 
-제목, 분기 안내문, 따옴표 등을 출력하지 마세요.
-중복 출력은 하지 말고, 반드시 1번 또는 2번 하나만 출력하세요.
-출력 시 가장 위에 '{query}가 증상일 경우', '{query}가 영양소일 경우' 같은 문장은 절대 출력하지 마세요.
+        query_type = classification_response.choices[0].message.function_call.arguments
+        query_type = eval(query_type)['type']
 
--1번 증상일 경우:
+        # 2단계: 해당 타입에 따라 상세 설명 생성
+        if query_type == "증상":
+            prompt = f"""
+당신은 건강 영양 전문가입니다.
+
+'{query}'는 증상입니다. 아래 항목을 ✅로 시작하며, 항목마다 줄 간격을 넣어 자연스럽게 설명해 주세요. 제목 없이 ✅만 붙이세요.
+
 ✅ 요약 설명과 원인
 
 ✅ 필요한 영양소
@@ -27,9 +52,14 @@ AI로써 둘 중 하나로만 판단하여 친절하고 자연스럽게 설명�
 
 ✅ 도움이 되는 생활 습관
 
-✅ 모든 정보는 참고용이며, {query}에 대한 증상이 지속되면 전문가 상담이 필요합니다.
+✅ 모든 정보는 참고용이며, '{query}'에 대한 증상이 지속되면 전문가 상담이 필요합니다.
+"""
+        else:  # 영양소일 경우
+            prompt = f"""
+당신은 건강 영양 전문가입니다.
 
--2번 영양소일 경우:
+'{query}'는 영양소입니다. 아래 항목을 ✅로 시작하며, 항목마다 줄 간격을 넣어 자연스럽게 설명해 주세요. 제목 없이 ✅만 붙이세요.
+
 ✅ 주요 특징과 우리 몸에 주는 도움
 
 ✅ 부족 시 증상
@@ -38,13 +68,11 @@ AI로써 둘 중 하나로만 판단하여 친절하고 자연스럽게 설명�
 
 ✅ 효과적인 섭취 방법
 
-✅ 모든 정보는 참고용이며, {query}이 부족하다고 느껴지면 전문가 상담이 필요합니다.
-
-※ 첫 문장은 들여쓰기 없이 출력하고, 각 줄 맨 앞에는 ✅ 만 붙이세요. 제목은 작성하지 마세요.
+✅ 모든 정보는 참고용이며, '{query}'이(가) 부족하다고 느껴지면 전문가 상담이 필요합니다.
 """
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        detail_response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "당신은 건강 영양 전문가입니다."},
                 {"role": "user", "content": prompt}
@@ -52,11 +80,10 @@ AI로써 둘 중 하나로만 판단하여 친절하고 자연스럽게 설명�
             temperature=0.4
         )
 
-        return response.choices[0].message.content.strip()
+        return detail_response.choices[0].message.content.strip()
 
     except OpenAIError as e:
         return f"⚠️ 오류 발생: {str(e)}"
-
 
 
 
