@@ -1,49 +1,27 @@
 import os
 from openai import OpenAI
 from openai import OpenAIError
+import time
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    timeout=30.0  # 30 second timeout to prevent hanging
+)
 
 def get_ai_recommendation(query):
+    """
+    Optimized single-call approach that determines query type and generates response in one API call
+    """
+    start_time = time.time()
+    
     try:
-        # 1단계: 쿼리 유형 판단 (증상인지 영양소인지)
-        classification_response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "당신은 건강 관련 단어를 분석하는 전문가입니다."},
-                {"role": "user", "content": f"'{query}'는 건강 관련 단어입니다. 이것이 '증상'인지 '영양소'인지 딱 한 단어로만 답해주세요."}
-            ],
-            functions=[
-                {
-                    "name": "classify_query",
-                    "description": "입력된 단어가 증상인지 영양소인지 판단",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "enum": ["증상", "영양소"],
-                                "description": "입력된 단어의 분류 결과"
-                            }
-                        },
-                        "required": ["type"]
-                    }
-                }
-            ],
-            function_call={"name": "classify_query"},
-            temperature=0
-        )
-
-        query_type = classification_response.choices[0].message.function_call.arguments
-        query_type = eval(query_type)['type']
-
-        # 2단계: 해당 타입에 따라 상세 설명 생성
-        if query_type == "증상":
-            prompt = f"""
+        # Single optimized prompt that handles both classification and response generation
+        optimized_prompt = f"""
 당신은 건강 영양 전문가입니다.
 
-'{query}'는 증상입니다. 아래 항목을 ✅로 시작하며, 항목마다 줄 간격을 넣어 자연스럽게 설명해 주세요. 제목 없이 ✅만 붙이세요.
+'{query}'에 대해 분석해주세요. 이것이 건강 증상인지 영양소인지 자동으로 판단하고, 해당하는 형식으로 답변해주세요.
 
+**증상인 경우 형식:**
 ✅ 요약 설명과 원인
 
 ✅ 필요한 영양소
@@ -53,13 +31,8 @@ def get_ai_recommendation(query):
 ✅ 도움이 되는 생활 습관
 
 ✅ 모든 정보는 참고용이며, '{query}'에 대한 증상이 지속되면 전문가 상담이 필요합니다.
-"""
-        else:  # 영양소일 경우
-            prompt = f"""
-당신은 건강 영양 전문가입니다.
 
-'{query}'는 영양소입니다. 아래 항목을 ✅로 시작하며, 항목마다 줄 간격을 넣어 자연스럽게 설명해 주세요. 제목 없이 ✅만 붙이세요.
-
+**영양소인 경우 형식:**
 ✅ 주요 특징과 우리 몸에 주는 도움
 
 ✅ 부족 시 증상
@@ -70,24 +43,57 @@ def get_ai_recommendation(query):
 
 ✅ 모든 정보는 참고용이며, '{query}'이(가) 부족하다고 느껴지면 전문가 상담이 필요합니다.
 
-* 마지막 전문가 상담이 필요 하다는 문구는 적혀 있는데로 한 줄만 작성하고, 추가적인 경고나 설명은 하지마세요.
-
-* 첫 문장 요약 설명과 원인, 주요특징과 우리 몸에 주는 도움 등은  들여쓰기 없이 출력해주세요.
+각 항목마다 줄 간격을 넣어 자연스럽게 설명해 주세요. 제목 없이 ✅만 붙이고, 들여쓰기 없이 출력해주세요.
 """
 
-        detail_response = client.chat.completions.create(
-           model="gpt-4o",
-           messages=[
-                {"role": "system", "content": "당신은 건강 영양 전문가입니다."},
-                {"role": "user", "content": prompt}
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # Use faster, cheaper model for better performance
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "당신은 건강 영양 전문가입니다. 간결하고 정확한 정보를 제공하며, 입력된 단어가 증상인지 영양소인지 자동으로 판단하여 적절한 형식으로 답변합니다."
+                },
+                {"role": "user", "content": optimized_prompt}
             ],
-            temperature=0.4
+            temperature=0.3,  # Lower temperature for more consistent responses
+            max_tokens=1500,  # Limit response length for faster processing
+            presence_penalty=0.1  # Encourage concise responses
         )
 
-        return detail_response.choices[0].message.content.strip()
+        result = response.choices[0].message.content.strip()
+        
+        # Log performance metrics (can be removed in production)
+        elapsed_time = time.time() - start_time
+        print(f"AI response generated in {elapsed_time:.2f} seconds")
+        
+        return result
 
     except OpenAIError as e:
-        return f"⚠️ 오류 발생: {str(e)}"
+        error_msg = f"⚠️ AI 서비스 오류: 잠시 후 다시 시도해주세요."
+        print(f"OpenAI API Error: {str(e)}")
+        return error_msg
+    
+    except Exception as e:
+        error_msg = f"⚠️ 서비스 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        print(f"Unexpected error: {str(e)}")
+        return error_msg
+
+# Additional helper function for future async optimization
+def get_ai_recommendation_with_fallback(query, max_retries=2):
+    """
+    Enhanced version with retry logic for production use
+    """
+    for attempt in range(max_retries):
+        try:
+            result = get_ai_recommendation(query)
+            if not result.startswith("⚠️"):
+                return result
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {str(e)}")
+            if attempt < max_retries - 1:
+                time.sleep(1)  # Brief delay before retry
+    
+    return "⚠️ 서비스가 일시적으로 불안정합니다. 잠시 후 다시 시도해주세요."
 
 
 

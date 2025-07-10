@@ -1,35 +1,167 @@
+/* Optimized CSS for Wello Health App - v1.1 */
+
+/* Base styles with system font fallbacks */
 body {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: #ffffff;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 광고 영역 */
+/* Performance-optimized animations */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimized transitions */
+a, button, input {
+  transition: all 0.2s ease;
+}
+
+/* 광고 영역 최적화 */
 .adsense-placeholder {
   border: 1px dashed #ccc;
   padding: 20px;
   background-color: #f8f9fa;
   border-radius: 8px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 입력창 스타일 */
+/* 입력창 스타일 최적화 */
 input[type="text"] {
   height: 50px;
   font-size: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 0 16px;
+  background-color: #fff;
+  will-change: border-color, box-shadow;
 }
 
-/* 버튼 */
+input[type="text"]:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  outline: none;
+}
+
+/* 버튼 최적화 */
 button {
-  font-weight: bold;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  will-change: background-color, transform;
 }
 
-/* 결과 표시 */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 결과 표시 최적화 */
 .alert-info {
   font-size: 1.05rem;
   line-height: 1.6;
+  border-radius: 8px;
+  border-left: 4px solid #17a2b8;
+  background-color: #f8f9fa;
+  position: relative;
+  overflow-wrap: break-word;
 }
 
 /* 링크 효과 */
 footer a:hover {
   text-decoration: underline;
+  transform: translateY(-1px);
+}
+
+/* 성능 최적화된 로딩 애니메이션 */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  will-change: transform;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  input[type="text"] {
+    height: 44px;
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+  
+  .container {
+    padding: 0 10px;
+  }
+  
+  .adsense-placeholder {
+    padding: 15px;
+    min-height: 100px;
+  }
+}
+
+/* 다크모드 지원 (향후 기능) */
+@media (prefers-color-scheme: dark) {
+  /* 다크모드 스타일은 향후 추가 예정 */
+}
+
+/* 인쇄 최적화 */
+@media print {
+  .adsense-placeholder,
+  button,
+  nav {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* 접근성 향상 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  input[type="text"] {
+    border-width: 3px;
+  }
+  
+  button {
+    border: 2px solid currentColor;
+  }
 }
 
