@@ -1,20 +1,89 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="p-4 bg-white rounded shadow-sm">
-  <form method="post" class="mb-4">
-    <input type="text" name="query" class="form-control" placeholder="예: 탈모, 오메가3" required>
-    <button class="btn btn-success mt-3 w-100">추천받기</button>
+  <form id="recommendationForm" method="post" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="query" id="queryInput" class="form-control" placeholder="예: 탈모, 오메가3, 비타민D" required>
+      <button type="submit" class="btn btn-success" id="submitBtn">
+        <span class="btn-text">추천받기</span>
+        <span class="btn-loading d-none">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          처리중...
+        </span>
+      </button>
+    </div>
   </form>
 
-  {% if recommendation %}
-    <div class="alert alert-info" style="white-space: pre-wrap;">
-      {{ recommendation }}
-    </div>
-  {% endif %}
+  <div id="resultContainer" class="fade-in" style="display: none;">
+    <div class="alert alert-info" id="recommendationText" style="white-space: pre-wrap;"></div>
+  </div>
 
   <div class="adsense-placeholder text-center mt-5">
     <p class="text-muted">📢 여기에 Google AdSense 광고가 들어갈 수 있습니다.</p>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recommendationForm');
+    const queryInput = document.getElementById('queryInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+    const resultContainer = document.getElementById('resultContainer');
+    const recommendationText = document.getElementById('recommendationText');
+
+    // Handle form submission with AJAX
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const query = queryInput.value.trim();
+        if (!query) return;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/recommendation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                recommendationText.textContent = data.recommendation;
+                resultContainer.style.display = 'block';
+                resultContainer.classList.add('fade-in');
+            } else {
+                recommendationText.textContent = data.error || '오류가 발생했습니다.';
+                resultContainer.style.display = 'block';
+            }
+        } catch (error) {
+            recommendationText.textContent = '네트워크 오류가 발생했습니다. 다시 시도해주세요.';
+            resultContainer.style.display = 'block';
+        } finally {
+            // Reset loading state
+            submitBtn.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+        }
+    });
+
+    // Handle traditional form submission as fallback
+    form.addEventListener('submit', function(e) {
+        if (!window.fetch) {
+            // Fallback for older browsers
+            return;
+        }
+    });
+});
+</script>
 {% endblock %}
 
