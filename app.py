@@ -18,6 +18,10 @@ def index():
 def about():
     return render_template("about.html")
 
+@app.route("/ads.txt")
+def ads():
+    return send_from_directory("static", "ads.txt")
+
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
