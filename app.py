@@ -48,7 +48,8 @@ def blog():
         {"title": "탈모에 좋은 음식 5가지", "slug": "hair-loss-foods"},
         {"title": "스트레스 완화에 효과적인 영양소", "slug": "stress-nutrients"},
         {"title": "면역력 강화 식품 리스트", "slug": "immune-foods"},
-    ]
+        {"title": "피로 회복에 좋은 음식", "slug": "fatigue-foods"},
+ ]
     return render_template("blog.html", posts=posts)
 
 @app.route("/blog/<slug>")
